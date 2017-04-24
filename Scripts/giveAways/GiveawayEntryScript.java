@@ -18,14 +18,14 @@ public class GiveawayEntryScript  {
         int pages=10;
 		BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 		try {
-			System.out.print("Please enter your Goodreads login email address:\n");
+			System.out.println("Please enter your Goodreads login email address:");
 			email = console.readLine();
-			System.out.print("Please enter your Goodreads login password \n(maybe change it before using this script? It'll display on the screen when you type it):\n");
+			System.out.println("Please enter your Goodreads login password \n(Change it before using this script? It'll display on the screen when you type it):");
 			password = console.readLine();
 			System.out.println("How many pages of giveaways do you want to enter? Enter a numeric value:");
 			pages = Integer.parseInt(console.readLine());
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 		
         
@@ -50,7 +50,6 @@ public class GiveawayEntryScript  {
               elementInFocus.click();
               elementInFocus = driver.findElement(By.linkText("Select This Address"));
               elementInFocus.click();
-              //on checkboxes page
               elementInFocus = driver.findElement(By.name("entry_terms"));
               elementInFocus.click();
               elementInFocus = driver.findElement(By.name("want_to_read"));
