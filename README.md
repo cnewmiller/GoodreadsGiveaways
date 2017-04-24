@@ -17,9 +17,7 @@ How to use:
   
   -Using the terminal or command line, navigate to wherever you extracted the Runnable JAR folder.
   
-  -If you don't know how to do this, try clicking and dragging the folder to the "terminal" or "command line" application on your toolbar
-      
-     -If you still can't figure this out, ask someone for help. Don't worry, you're doing something simple using complicated tools.
+  -If you don't know how to do this, try clicking and dragging the folder to the "terminal" or "command line" application on your toolbar. If you still can't figure this out, ask someone for help. Don't worry, you're doing something simple using complicated tools.
 
 -Type into the terminal/command line, without the quotes: "java -jar GoodreadsScript.jar"
  
