@@ -3,52 +3,88 @@ package giveAways;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Console;
-
+import java.io.IOException;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 public class GiveawayEntryScript  {
+	private static String checkForFlag(String[] args, String flag) throws IOException{
+		for (int i=0; i<args.length;i++){
+			if (args[i].equals(flag)){
+				if ((i+1)<args.length) return args[i+1];
+				else throw new IOException("Your use case was wrong!");
+			}
+		}
+		
+		return null;
+	}
+	
     public static void main(String[] args) throws InterruptedException {
-
+    	
+    	
+    	String email=null;
+    	boolean doTags = false;
+    	String raw = null;
+    	
+    	try{
+    		email = checkForFlag(args, "-e");
+    		raw = checkForFlag(args, "-t");
+    	}
+    	catch(IOException e){
+    		System.out.println("something is up with your tagging attempt, the script will just run normally...");
+    		email = null;
+    		raw = null;
+    	}
+    	
+    	
+    	
     	Console c = System.console();
         
-        String email=null;
+        
         String password = null;
-        boolean doTags = false;
+        
         String[] tags = null;
         int[] nums = null;
         int pages=10;
 		BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 		try {
-			System.out.println("Please enter your Goodreads login email address:");
-			email = c.readLine();//console.readLine();
-			System.out.println("Please enter your Goodreads login password: (it won't be saved) \n");
+			if (email == null){
+				System.out.println("Please enter your Goodreads login email address:");
+				email = c.readLine();//console.readLine();				
+			}
+			
+			System.out.println("Please enter your Goodreads login password: (it won't be saved)");
 //			password = console.readLine();
 			password = new String(c.readPassword());
-			System.out.println("How many pages of giveaways do you want to enter? Enter a numeric value (0 is valid):");
-			pages = Integer.parseInt(console.readLine());
 			
+			if (raw == null){
+				System.out.print("Do you want to enter giveaways by tags? (y/n): ");
+				doTags = (console.readLine().equals("y"));				
+			}
+			else
+				doTags = true;
 			
-			System.out.print("Do you want to enter giveaways by tags? (y/n): ");
-			doTags = (console.readLine().equals("y"));
 			if (doTags){
-				System.out.println("\t\t******Attention!******\n"
+				if (raw==null)
+					System.out.println("\t\t******Attention!******\n"
 						+ "Tags are searched seperately, NOT AS A SINGLE TERM.\n"
 						+ "This feature is for selection, not bulk entry of soon-to-end giveaways.\n"
 						+ "Please enter the tags you wish to search, then the number of pages of that tag, seperated by commas\n"
 						+ "Example: 'fantasy,2,science-fiction,3' will enter 2 pages of the fantasy tag and 3 pages of the science-fiction tag\n"
 						+ "Press enter when finished:");
+				String rawSplit[] = (raw==null? console.readLine().split(",") : raw.split(",") );
 				
-				String raw[] = console.readLine().split(",");
-				tags = new String[raw.length/2];
-				nums = new int[raw.length/2];
-				for (int i = 0;i<raw.length;i+=2){
-					tags[i/2] = raw[i];
-					nums[i/2] = Integer.parseInt(raw[i+1]);
+				
+				tags = new String[rawSplit.length/2];
+				nums = new int[rawSplit.length/2];
+				for (int i = 0;i<rawSplit.length;i+=2){
+					tags[i/2] = rawSplit[i];
+					nums[i/2] = Integer.parseInt(rawSplit[i+1]);
 				}
 			}
 			
@@ -79,6 +115,18 @@ public class GiveawayEntryScript  {
         	}
         }
         else{
+        	System.out.println("How many pages of giveaways do you want to enter? Enter a numeric value (0 is valid):");
+			try {
+				pages = Integer.parseInt(console.readLine());
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			}
         	System.out.println("Entering general giveaways...");
         	String url = "https://www.goodreads.com/giveaway?utf8=%E2%9C%93&sort=ending_soon&filter=print";
         	enterAllGiveawaysOnPage(driver, url, pages);
@@ -96,18 +144,23 @@ public class GiveawayEntryScript  {
         	System.out.println("Beginning page "+(pagenum+1)+" of "+pagesToEnter+"...");
         	String pageToReturnTo = driver.getCurrentUrl();
         	List<WebElement> elements = driver.findElements(By.linkText("Enter Giveaway"));
-        	
-        	while (elements.size()>0){
-              WebElement elementInFocus = driver.findElement(By.linkText("Enter Giveaway"));
-              elementInFocus.click();
-              elementInFocus = driver.findElement(By.linkText("Select This Address"));
-              elementInFocus.click();
-              elementInFocus = driver.findElement(By.name("entry_terms"));
-              elementInFocus.click();
-              elementInFocus = driver.findElement(By.name("want_to_read"));
-              elementInFocus.click();
-              elementInFocus = driver.findElement(By.name("commit"));
-              elementInFocus.click();
+        	int i = 0; //number of giveaways to skip, for whatever reason
+        	while (elements.size()>i){
+              WebElement elementInFocus = elements.get(i);
+              try{
+	              elementInFocus.click();
+	              elementInFocus = driver.findElement(By.linkText("Select This Address"));
+	              elementInFocus.click();
+	              elementInFocus = driver.findElement(By.name("entry_terms"));
+	              elementInFocus.click();
+	              elementInFocus = driver.findElement(By.name("want_to_read"));
+	              elementInFocus.click();
+	              elementInFocus = driver.findElement(By.name("commit"));
+	              elementInFocus.click();
+              }
+              catch(NoSuchElementException e){
+            	  i++;
+              }
               driver.get(pageToReturnTo);
               elements = driver.findElements(By.linkText("Enter Giveaway"));
           }
