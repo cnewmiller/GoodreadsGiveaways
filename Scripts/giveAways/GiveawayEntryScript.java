@@ -110,7 +110,7 @@ public class GiveawayEntryScript  {
         	for (int i = 0; i<tags.length;i++){
         		String tag = tags[i];
         		System.out.println("Entering tag "+tag+"...");
-        		String url ="https://www.goodreads.com/giveaway/tag/" + tag + "?utf8=%E2%9C%93&sort=ending_soon&filter=print";
+        		String url ="https://www.goodreads.com/giveaway/genre/" + tag + "?utf8=✓&sort=featured&filter=print";
         		enterAllGiveawaysOnPage(driver, url, nums[i]);
         	}
         }
